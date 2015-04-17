@@ -1,0 +1,3 @@
+create database AlibabaTC;
+use AlibabaTC;
+create table tbl_tianchi_mobile_recommend_train_user(idx INT NOT NULL AUTO_INCREMENT,user_id VARCHAR(25) NOT NULL,item_id VARCHAR(25) NOT NULL,behavior_type INT NOT NULL,user_geohash VARCHAR(20),item_category VARCHAR(20),time DATE,hour INT,PRIMARY KEY(idx) );
