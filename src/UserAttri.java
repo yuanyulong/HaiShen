@@ -9,7 +9,7 @@ public class UserAttri {
 	//前三个数越大说明了用户越喜欢o2o的购物形式
 	public int usercount;//用户频数	
 	public HashMap<Float,Integer> categorycount;//用户购买商品种类的数量	
-	public HashMap<Float,Integer> itemcount;//用户购买商品的数量
+	public HashMap<String,Integer> itemcount;//用户购买商品的数量
 	
 	public HashMap<Integer,Integer> behaviorcount;//每个用户消费类型的统计
 	public HashMap<Integer,Integer> behaviorbuycount;//每个用户消费类型转化为购买的统计
