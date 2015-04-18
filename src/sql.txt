@@ -1,3 +1,12 @@
 create database AlibabaTC;
 use AlibabaTC;
 create table tbl_tianchi_mobile_recommend_train_user(idx INT NOT NULL AUTO_INCREMENT,user_id VARCHAR(25) NOT NULL,item_id VARCHAR(25) NOT NULL,behavior_type INT NOT NULL,user_geohash VARCHAR(20),item_category VARCHAR(20),time DATE,hour INT,PRIMARY KEY(idx) );
+
+
+
+
+create table tbl_item_attr(idx INT NOT NULL AUTO_INCREMENT,item_id VARCHAR(25) UNIQUE,geohash VARCHAR(20),item_category VARCHAR(20),buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,clicked_count INT,collected_count INT,addedincart_count INT,PRIMARY KEY(idx) );
+create table tbl_user_attr(user_id VARCHAR(25),click_count INT,collect_count INT,addincart_count INT,buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id));
+create table tbl_user_item(user_id VARCHAR(25),item_id VARCHAR(25),item_category VARCHAR(20),buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id,item_id));
+
+create table tbl_user_geo(user_id VARCHAR(25),geohash VARCHAR(20),buy_count INT,workend_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id,geohash));
