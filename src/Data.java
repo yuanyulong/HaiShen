@@ -16,13 +16,13 @@ public class Data {
 		public int behavior_type;
 		public String user_geohash;
 		public String item_category;
-		public Time time; 
+		public Time time;
 	}
 	HashMap<Time,Vector<Train_User>> data;//按日期划分保存的用户购买集
 	static float count=0;
-	
-	
-	
+
+
+
 	public Data()
 	{
 		data = new HashMap<Time,Vector<Train_User>>();
@@ -43,7 +43,7 @@ public class Data {
 				tu.behavior_type = Integer.parseInt(str[2]);
 				tu.user_geohash = str[3];
 				tu.item_category = str[4];
-				
+
 				String[] str_time = str[5].split(" ");
 				SimpleDateFormat mydf = new SimpleDateFormat("yyyy-MM-dd");
 				Date dt = mydf.parse(str_time[0]);
@@ -54,7 +54,7 @@ public class Data {
 				tu.time.setMonth(cal.get(Calendar.MONTH));
 				tu.time.setDay(cal.get(Calendar.DAY_OF_MONTH));
 				tu.time.setHour(Integer.parseInt(str_time[1]));
-//是否是工作日				
+//是否是工作日
 				if((cal.get(Calendar.DAY_OF_WEEK)-1)>=1&&(cal.get(Calendar.DAY_OF_WEEK)-1)<=5)
 				{
 					tu.time.setType(1);
@@ -67,7 +67,7 @@ public class Data {
 				{
 					tu.time.setType(3);
 				}
-				
+
 				//data.get(key);
 				//System.out.println(s);
 				/*System.out.println(tu.user_id);
@@ -109,9 +109,9 @@ public class Data {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	//将数据保存到数据库中
 	public void saveData(String filename)
 	{
@@ -122,7 +122,19 @@ public class Data {
 			br = new BufferedReader(new FileReader(filename));
 			String s = null;
 			s=br.readLine();
-			
+
+			GlobalInfo gi = GlobalInfo.getInstance();
+			dbconn = new DbConnection(gi.host,gi.port,gi.dbname,gi.username,gi.password);
+			if(! dbconn.getConnection()) {
+				System.out.println("连接失败!");
+                System.out.println("Can not connect the mysql\n");
+                System.exit(1);
+            }
+            //public Connection conn = dbconn.getConnecitonHandle();
+            dbconn.conn.setAutoCommit(false);
+            int count = 0;
+            String sql = "insert into tbl_tianchi_mobile_recommend_train_user(user_id,item_id,behavior_type,user_geohash,item_category,time,hour) values(?,?,?,?,?,?,?);";
+            pstmt = dbconn.conn.prepareStatement(sql);
 			while((s=br.readLine())!=null)
 			{
 				String[] str = s.split(",");
@@ -131,36 +143,55 @@ public class Data {
 				int behavior_type = Integer.parseInt(str[2]);
 				String user_geohash = str[3];
 				String item_category = str[4];
-				
+
 				String[] str_time = str[5].split(" ");
 				SimpleDateFormat mydf = new SimpleDateFormat("yyyy-MM-dd");
 				java.util.Date util_date = mydf.parse(str_time[0]);
-				java.sql.Date sql_date = new java.sql.Date(util_date.getTime());	
-				
+				java.sql.Date sql_date = new java.sql.Date(util_date.getTime());
+
 				int hour = Integer.parseInt(str_time[1]);
-				
-				GlobalInfo gi = GlobalInfo.getInstance();
-				dbconn = new DbConnection(gi.host,gi.port,gi.dbname,gi.username,gi.password);
-				if(dbconn.getConnection())
-				{
-					String sql = "insert into tbl_tianchi_mobile_recommend_train_user(user_id,item_id,behavior_type,user_geohash,item_category,time,hour) values(?,?,?,?,?,?,?);";
-					pstmt = dbconn.conn.prepareStatement(sql);
-					pstmt.setString(1,user_id);
-					pstmt.setString(2,item_id);
-					pstmt.setInt(3, behavior_type);
-					pstmt.setString(4, user_geohash);
-					pstmt.setString(5,item_category);
-					pstmt.setDate(6,sql_date);
-					pstmt.setInt(7, hour);
-					int t = pstmt.executeUpdate();//执行插入
-					//System.out.println(t);
-				}else
-				{
-					System.out.println("连接失败!");
-				}
+				//这边用来设置每次批量插入的条数
+				//之所以设置为1，因为数据中有重复项
+				//在数据库中进行了唯一性约束
+                //if (count < 1) {
+				pstmt.setString(1,user_id);
+                pstmt.setString(2,item_id);
+                pstmt.setInt(3, behavior_type);
+                pstmt.setString(4, user_geohash);
+                pstmt.setString(5,item_category);
+                pstmt.setDate(6,sql_date);
+                pstmt.setInt(7, hour);
+                pstmt.addBatch();
+                count++;
+				if (count < 5000) {
+                    
+                } else {
+                    /*批量插入*/
+                	try{
+                		pstmt.executeBatch();
+                	}catch (SQLException e) {
+            			// TODO Auto-generated catch block
+            			//e.printStackTrace();
+                	}
+            		dbconn.conn.commit();
+            		pstmt.close();
+            		pstmt = dbconn.conn.prepareStatement(sql);
+                    count = 0;
+                }
+                //int t = pstmt.executeUpdate();//执行插入
+                //System.out.println(t);
 			}
 			br.close();
-			pstmt.close();
+            if (count > 0) {
+            	try{
+            		pstmt.executeBatch();
+            		dbconn.conn.commit();
+            		pstmt.close();
+            	}catch (SQLException e) {
+        			// TODO Auto-generated catch block
+        			e.printStackTrace();
+            	}
+            }
 			dbconn.conn.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -170,10 +201,11 @@ public class Data {
 			e.printStackTrace();
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();			
+			e.printStackTrace();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
 	}
 }

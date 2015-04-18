@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.Statement;
 public class DbConnection {
-	public Connection conn;
+	public Connection conn = null;
 	public String host;//主机ip地址
 	public String port;//端口号
 	public String dbname;//数据库名称
@@ -20,7 +20,7 @@ public class DbConnection {
 		this.username = username;
 		this.password = password;
 		this.url = "jdbc:mysql://"+this.host+":"+this.port+"/"+this.dbname
-				+"?"+"user="+this.username+"&"+"password="+this.password;
+				+"?"+"user="+this.username+"&"+"password="+this.password+"&rewriteBatchedStatements=true";
 	}
 	public boolean getConnection()
 	{
@@ -29,7 +29,7 @@ public class DbConnection {
 			conn = DriverManager.getConnection(url);
 			return true;
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		} catch (SQLException e) {
@@ -37,16 +37,26 @@ public class DbConnection {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 	}
 	public void closeConneciton()
 	{
 		try {
 			conn.close();
+            conn = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
+
+	public Connection getConnecitonHandle()
+    {
+        if (conn == null) {
+            getConnection();
+        }
+        return conn;
+    }
+
 }
