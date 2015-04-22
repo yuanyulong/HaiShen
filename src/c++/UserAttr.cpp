@@ -40,5 +40,5 @@ string UserAttr::toString()
 	return user_id+","
 		+str_click_count+","+str_collect_count+","+str_addincart_count+","
 		+str_buy_count+","+str_workday_buy_count+","+str_weekend_buy_count+","
-		+str_festival_buy_count+"\r\n";
+		+str_festival_buy_count+"\n";
 }

@@ -6,7 +6,74 @@ create table tbl_tianchi_mobile_recommend_train_user(idx INT NOT NULL AUTO_INCRE
 
 
 create table tbl_item_attr(idx INT NOT NULL AUTO_INCREMENT,item_id VARCHAR(25) UNIQUE,geohash VARCHAR(20),item_category VARCHAR(20),buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,clicked_count INT,collected_count INT,addedincart_count INT,PRIMARY KEY(idx) );
+
 create table tbl_user_attr(user_id VARCHAR(25),click_count INT,collect_count INT,addincart_count INT,buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id));
+
 create table tbl_user_item(user_id VARCHAR(25),item_id VARCHAR(25),item_category VARCHAR(20),buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id,item_id));
 
-create table tbl_user_geo(user_id VARCHAR(25),geohash VARCHAR(20),buy_count INT,workend_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id,geohash));
+create table tbl_user_geo(user_id VARCHAR(25),geohash VARCHAR(20),buy_count INT,workday_buy_count INT,weekend_buy_count INT,festival_buy_count INT,PRIMARY KEY(user_id,geohash));
+
+create table tbl_tianchi_mobile_recommend_train_user_new(idx INT NOT NULL AUTO_INCREMENT,user_id VARCHAR(25) NOT NULL,item_id VARCHAR(25) NOT NULL,behavior_type INT NOT NULL,user_geohash VARCHAR(20),item_category VARCHAR(20),time DATE,hour INT,PRIMARY KEY(idx) );
+
+
+select user_id,item_id,behavior_type,user_geohash,item_category,time,hour from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-18' into outfile '/home/mysql/AlibabaData/recommend_train_user_2014_12_18.csv' fields terminated by ',' lines terminated by '\r\n';
+
+CREATE TABLE `tbl_item_attr_temp` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(25) DEFAULT NULL,
+  `geohash` varchar(20) DEFAULT NULL,
+  `item_category` varchar(20) DEFAULT NULL,
+  `buy_count` int(11) DEFAULT NULL,
+  `workday_buy_count` int(11) DEFAULT NULL,
+  `weekend_buy_count` int(11) DEFAULT NULL,
+  `festival_buy_count` int(11) DEFAULT NULL,
+  `clicked_count` int(11) DEFAULT NULL,
+  `collected_count` int(11) DEFAULT NULL,
+  `addedincart_count` int(11) DEFAULT NULL,
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=4683585 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `tbl_user_attr_temp` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(25) DEFAULT NULL,
+  `click_count` int(11) DEFAULT NULL,
+  `collect_count` int(11) DEFAULT NULL,
+  `addincart_count` int(11) DEFAULT NULL,
+  `buy_count` int(11) DEFAULT NULL,
+  `workday_buy_count` int(11) DEFAULT NULL,
+  `weekend_buy_count` int(11) DEFAULT NULL,
+  `festival_buy_count` int(11) DEFAULT NULL,
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=202325 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `tbl_user_geo_temp` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(25) DEFAULT NULL,
+  `geohash` varchar(20) DEFAULT NULL,
+  `buy_count` int(11) DEFAULT NULL,
+  `workday_buy_count` int(11) DEFAULT NULL,
+  `weekend_buy_count` int(11) DEFAULT NULL,
+  `festival_buy_count` int(11) DEFAULT NULL,
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=2843858 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `tbl_user_item_temp` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(25) DEFAULT NULL,
+  `item_id` varchar(25) DEFAULT NULL,
+  `item_category` varchar(20) DEFAULT NULL,
+  `buy_count` int(11) DEFAULT NULL,
+  `workday_buy_count` int(11) DEFAULT NULL,
+  `weekend_buy_count` int(11) DEFAULT NULL,
+  `festival_buy_count` int(11) DEFAULT NULL,
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=11427739 DEFAULT CHARSET=latin1;
+
+
+insert into tbl_item_attr(item_id,geohash,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count,clicked_count,collected_count,addedincart_count) select item_id,geohash,item_category,sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count),sum(clicked_count),sum(collected_count),sum(addedincart_count) from tbl_item_attr_temp group by item_id;
+
+insert into tbl_user_attr(user_id,click_count,collect_count,addincart_count,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) select user_id,sum(click_count),sum(collect_count),sum(addincart_count),sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count) from tbl_user_attr_temp group by user_id;
+
+insert into tbl_user_item(user_id,item_id,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) select user_id,item_id,item_category,sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count) from tbl_user_item_temp group by user_id,item_id;
+
+insert into tbl_user_geo(user_id,geohash,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) select user_id,geohash,sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count) from tbl_user_geo_temp group by user_id,geohash;

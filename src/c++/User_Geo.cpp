@@ -26,5 +26,5 @@ string User_Geo::toString()
 	sprintf(str_weekend_buy_count,"%d",this->weekend_buy_count);
 	char str_festival_buy_count[20];
 	sprintf(str_festival_buy_count,"%d",this->festival_buy_count);
- 	return this->user_id+","+this->geohash+","+string(str_buy_count)+","+string(str_workday_buy_count)+","+string(str_weekend_buy_count)+"£¬"+string(str_festival_buy_count)+"\r\n";
+	return this->user_id+","+this->geohash+","+str_buy_count+","+str_workday_buy_count+","+str_weekend_buy_count+","+str_festival_buy_count+"\n";
 }

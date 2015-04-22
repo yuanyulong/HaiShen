@@ -43,5 +43,5 @@ string ItemAttr::toString()
 	return this->item_id+","+this->geohash+","+this->item_category+","
 		+str_buy_count+","+str_workday_buy_count+","+str_weekend_buy_count+","
 		+str_festival_buy_count+","+str_clicked_count+","+str_collected_count+","
-		+str_addedincart_count+"\r\n";
+		+str_addedincart_count+"\n";
 }

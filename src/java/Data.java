@@ -208,4 +208,362 @@ public class Data {
 			
 		}
 	}
+	
+		public void saveDataToItemAttr(String filename)
+		{
+			BufferedReader br = null;
+			PreparedStatement pstmt = null;
+			DbConnection dbconn = null;
+			try {
+				br = new BufferedReader(new FileReader(filename));
+				String s = null;
+				s=br.readLine();
+
+				GlobalInfo gi = GlobalInfo.getInstance();
+				dbconn = new DbConnection(gi.host,gi.port,gi.dbname,gi.username,gi.password);
+				if(! dbconn.getConnection()) {
+					System.out.println("连接失败!");
+	                System.out.println("Can not connect the mysql\n");
+	                System.exit(1);
+	            }
+	            //public Connection conn = dbconn.getConnecitonHandle();
+	            dbconn.conn.setAutoCommit(false);
+	            int count = 0;
+	            String sql = "insert into tbl_item_attr_temp(item_id,geohash,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count,clicked_count,collected_count,addedincart_count) values(?,?,?,?,?,?,?,?,?,?);";
+	            pstmt = dbconn.conn.prepareStatement(sql);
+				while((s=br.readLine())!=null)
+				{
+					String[] str = s.split(",");
+					String item_id = str[0];
+					String geohash = str[1];
+					String item_category = str[2];
+					int buy_count = Integer.parseInt(str[3]);
+					int workday_buy_count = Integer.parseInt(str[4]);
+					int weekend_buy_count = Integer.parseInt(str[5]);
+					int festival_buy_count = Integer.parseInt(str[6]);
+					int clicked_count = Integer.parseInt(str[7]);
+					int collected_count = Integer.parseInt(str[8]);
+					int addedincart_count = Integer.parseInt(str[9]);
+
+						pstmt.setString(1, item_id);
+						pstmt.setString(2, geohash);
+						pstmt.setString(3, item_category);
+						pstmt.setInt(4, buy_count);
+						pstmt.setInt(5, workday_buy_count);
+						pstmt.setInt(6, weekend_buy_count);
+						pstmt.setInt(7, festival_buy_count);
+						pstmt.setInt(8, clicked_count);
+						pstmt.setInt(9, collected_count);
+						pstmt.setInt(10,addedincart_count);
+	                pstmt.addBatch();
+	                count++;
+					if (count < 5000) {
+	                    
+	                } else {
+	                    /*批量插入*/
+	                	try{
+	                		pstmt.executeBatch();
+	                	}catch (SQLException e) {
+	            			// TODO Auto-generated catch block
+	            			//e.printStackTrace();
+	                	}
+	            		dbconn.conn.commit();
+	            		pstmt.close();
+	            		pstmt = dbconn.conn.prepareStatement(sql);
+	                    count = 0;
+	                }
+	                //int t = pstmt.executeUpdate();//执行插入
+	                //System.out.println(t);
+				}
+				br.close();
+	            if (count > 0) {
+	            	try{
+	            		pstmt.executeBatch();
+	            		dbconn.conn.commit();
+	            		pstmt.close();
+	            	}catch (SQLException e) {
+	        			// TODO Auto-generated catch block
+	        			e.printStackTrace();
+	            	}
+	            }
+				dbconn.conn.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				
+			}
+		}
+		
+
+		
+		
+		public void saveDataToUserAttr(String filename)
+		{
+			BufferedReader br = null;
+			PreparedStatement pstmt = null;
+			DbConnection dbconn = null;
+			try {
+				br = new BufferedReader(new FileReader(filename));
+				String s = null;
+				s=br.readLine();
+
+				GlobalInfo gi = GlobalInfo.getInstance();
+				dbconn = new DbConnection(gi.host,gi.port,gi.dbname,gi.username,gi.password);
+				if(! dbconn.getConnection()) {
+					System.out.println("连接失败!");
+	                System.out.println("Can not connect the mysql\n");
+	                System.exit(1);
+	            }
+	            //public Connection conn = dbconn.getConnecitonHandle();
+	            dbconn.conn.setAutoCommit(false);
+	            int count = 0;
+	            String sql = "insert into tbl_user_attr_temp(user_id,click_count,collect_count,addincart_count,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) values(?,?,?,?,?,?,?,?);";
+	            pstmt = dbconn.conn.prepareStatement(sql);
+				while((s=br.readLine())!=null)
+				{
+					String[] str = s.split(",");
+					String user_id = str[0];
+					int click_count = Integer.parseInt(str[1]);
+					int collect_count = Integer.parseInt(str[2]);
+					int addincart_count = Integer.parseInt(str[3]);
+					int buy_count = Integer.parseInt(str[4]);
+					int workday_buy_count = Integer.parseInt(str[5]);
+					int weekend_buy_count = Integer.parseInt(str[6]);
+					int festival_buy_count = Integer.parseInt(str[7]);
+
+					pstmt.setString(1, user_id);
+					pstmt.setInt(2, click_count);
+					pstmt.setInt(3, collect_count);
+					pstmt.setInt(4, addincart_count);
+					pstmt.setInt(5, buy_count);
+					pstmt.setInt(6, workday_buy_count);
+					pstmt.setInt(7, weekend_buy_count);
+					pstmt.setInt(8,festival_buy_count);
+
+					pstmt.addBatch();
+		            count++;
+		            if (count < 5000) {
+		                    
+		            } else {
+		              /*批量插入*/
+		                try{
+		                		pstmt.executeBatch();
+		                	}catch (SQLException e) {
+		            			// TODO Auto-generated catch block
+		            			//e.printStackTrace();
+		                	}
+		            		dbconn.conn.commit();
+		            		pstmt.close();
+		            		pstmt = dbconn.conn.prepareStatement(sql);
+		                    count = 0;
+		             }
+						//System.out.println(t);
+	
+				}
+				br.close();
+				if (count > 0) {
+	            	try{
+	            		pstmt.executeBatch();
+	            		dbconn.conn.commit();
+	            		pstmt.close();
+	            	}catch (SQLException e) {
+	        			// TODO Auto-generated catch block
+	        			e.printStackTrace();
+	            	}
+	            }
+				dbconn.conn.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
+
+		
+		
+		public void saveDataToUserGeo(String filename)
+		{
+			BufferedReader br = null;
+			PreparedStatement pstmt = null;
+			DbConnection dbconn = null;
+			try {
+				br = new BufferedReader(new FileReader(filename));
+				String s = null;
+				s=br.readLine();
+
+				GlobalInfo gi = GlobalInfo.getInstance();
+				dbconn = new DbConnection(gi.host,gi.port,gi.dbname,gi.username,gi.password);
+				if(! dbconn.getConnection()) {
+					System.out.println("连接失败!");
+	                System.out.println("Can not connect the mysql\n");
+	                System.exit(1);
+	            }
+	            //public Connection conn = dbconn.getConnecitonHandle();
+	            dbconn.conn.setAutoCommit(false);
+	            int count = 0;
+	            String sql = "insert into tbl_user_geo_temp(user_id,geohash,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) values(?,?,?,?,?,?);";
+	            pstmt = dbconn.conn.prepareStatement(sql);
+				while((s=br.readLine())!=null)
+				{
+					String[] str = s.split(",");
+					String user_id = str[0];
+					String geohash = str[1];
+					int buy_count = Integer.parseInt(str[2]);
+					int workday_buy_count = Integer.parseInt(str[3]);
+					int weekend_buy_count = Integer.parseInt(str[4]);
+					int festival_buy_count = Integer.parseInt(str[5]);
+
+					pstmt = dbconn.conn.prepareStatement(sql);
+					pstmt.setString(1, user_id);
+					pstmt.setString(2, geohash);
+					pstmt.setInt(3, buy_count);
+					pstmt.setInt(4, workday_buy_count);
+					pstmt.setInt(5,weekend_buy_count);
+					pstmt.setInt(6, festival_buy_count);
+
+					pstmt.addBatch();
+		            count++;
+		            if (count < 5000) {
+		                    
+		            } else {
+		              /*批量插入*/
+		                try{
+		                		pstmt.executeBatch();
+		                	}catch (SQLException e) {
+		            			// TODO Auto-generated catch block
+		            			//e.printStackTrace();
+		                	}
+		            		dbconn.conn.commit();
+		            		pstmt.close();
+		            		pstmt = dbconn.conn.prepareStatement(sql);
+		                    count = 0;
+		             }
+						//System.out.println(t);
+	
+				}
+				br.close();
+				if (count > 0) {
+	            	try{
+	            		pstmt.executeBatch();
+	            		dbconn.conn.commit();
+	            		pstmt.close();
+	            	}catch (SQLException e) {
+	        			// TODO Auto-generated catch block
+	        			e.printStackTrace();
+	            	}
+	            }
+				dbconn.conn.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
+		
+		
+
+		
+		
+		public void saveDataToUserItem(String filename)
+		{
+			BufferedReader br = null;
+			PreparedStatement pstmt = null;
+			DbConnection dbconn = null;
+			try {
+				br = new BufferedReader(new FileReader(filename));
+				String s = null;
+				s=br.readLine();
+
+				GlobalInfo gi = GlobalInfo.getInstance();
+				dbconn = new DbConnection(gi.host,gi.port,gi.dbname,gi.username,gi.password);
+				if(! dbconn.getConnection()) {
+					System.out.println("连接失败!");
+	                System.out.println("Can not connect the mysql\n");
+	                System.exit(1);
+	            }
+	            //public Connection conn = dbconn.getConnecitonHandle();
+	            dbconn.conn.setAutoCommit(false);
+	            int count = 0;
+	            String sql = "insert into tbl_user_item_temp(user_id,item_id,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) values(?,?,?,?,?,?,?);";
+	            pstmt = dbconn.conn.prepareStatement(sql);
+				while((s=br.readLine())!=null)
+				{
+					String[] str = s.split(",");
+					String user_id = str[0];
+					String item_id = str[1];
+					String item_category = str[2];
+					int buy_count = Integer.parseInt(str[3]);
+					int workday_buy_count = Integer.parseInt(str[4]);
+					int weekend_buy_count = Integer.parseInt(str[5]);
+					int festival_buy_count = Integer.parseInt(str[6]);
+
+					pstmt = dbconn.conn.prepareStatement(sql);
+					pstmt.setString(1, user_id);
+					pstmt.setString(2, item_id);
+					pstmt.setString(3, item_category);
+					pstmt.setInt(4,buy_count);
+					pstmt.setInt(5,workday_buy_count);
+					pstmt.setInt(6,weekend_buy_count);
+					pstmt.setInt(7,festival_buy_count);
+
+					pstmt.addBatch();
+		            count++;
+		            if (count < 5000) {
+		                    
+		            } else {
+		              /*批量插入*/
+		                try{
+		                		pstmt.executeBatch();
+		                	}catch (SQLException e) {
+		            			// TODO Auto-generated catch block
+		            			//e.printStackTrace();
+		                	}
+		            		dbconn.conn.commit();
+		            		pstmt.close();
+		            		pstmt = dbconn.conn.prepareStatement(sql);
+		                    count = 0;
+		             }
+						//System.out.println(t);
+	
+				}
+				br.close();
+				if (count > 0) {
+	            	try{
+	            		pstmt.executeBatch();
+	            		dbconn.conn.commit();
+	            		pstmt.close();
+	            	}catch (SQLException e) {
+	        			// TODO Auto-generated catch block
+	        			e.printStackTrace();
+	            	}
+	            }
+				dbconn.conn.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	
 }

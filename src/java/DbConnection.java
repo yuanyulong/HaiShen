@@ -20,7 +20,7 @@ public class DbConnection {
 		this.username = username;
 		this.password = password;
 		this.url = "jdbc:mysql://"+this.host+":"+this.port+"/"+this.dbname
-				+"?"+"user="+this.username+"&"+"password="+this.password+"&rewriteBatchedStatements=true";
+				+"?"+"user="+this.username+"&"+"password="+this.password;
 	}
 	public boolean getConnection()
 	{

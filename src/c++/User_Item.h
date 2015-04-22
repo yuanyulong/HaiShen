@@ -18,13 +18,8 @@ public:
 	string toString();
 	bool operator<(const User_Item &a)const
 	{
-		if(user_id==a.user_id)
-		{
-			return item_id < a.item_id;
-		}else
-		{
-			return user_id < a.user_id;
-		}
+		return (user_id < a.user_id || (user_id == a.user_id  && item_id < a.item_id));
+
 	}
 };
 #endif

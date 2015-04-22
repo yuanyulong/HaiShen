@@ -84,12 +84,12 @@ int clicked_count;//商品被点击的次数
 int collected_count;//商品被收藏的次数
 int addedincart_count;//商品被加入购物车的次数*/
 //将商品属性表中的数据写入商品属性表中
-void writeToFile_item_attr(map<ItemAttr,ItemAttr> map_tbl_item_attr,string path_item_attr)
+void writeToFile_item_attr(map<ItemAttr,ItemAttr> &map_tbl_item_attr,string path_item_attr)
 {
 	ofstream fout(path_item_attr);
 	if(!fout)
 		cout<<"打开文件失败"<<endl;
-	fout<<"item_id,geohash,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count,clicked_count,collected_count,addedincart_count\r\n";
+	fout<<"item_id,geohash,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count,clicked_count,collected_count,addedincart_count\n";
 	map<ItemAttr,ItemAttr>::iterator itr_item_attr;
 	for(itr_item_attr = map_tbl_item_attr.begin();itr_item_attr != map_tbl_item_attr.end();itr_item_attr++)
 	{
@@ -108,17 +108,18 @@ int workday_buy_count;//用户工作日购买的次数
 int weekend_buy_count;//用户周末购买的次数
 int festival_buy_count;//用户节日购买的次数
 */
-void writeToFile_user_attr(map<UserAttr,UserAttr> map_tbl_user_attr,string path_user_attr)
+void writeToFile_user_attr(map<UserAttr,UserAttr> &map_tbl_user_attr,string path_user_attr)
 {
 	ofstream fout(path_user_attr);
 	if(!fout)
 		cout<<"打开文件失败"<<endl;
-	fout<<"user_id,click_count,collect_count,addincart_count,buy_count,workday_buy_count,weekend_buy_count,festival_count\r\n";
+	fout<<"user_id,click_count,collect_count,addincart_count,buy_count,workday_buy_count,weekend_buy_count,festival_count\n";
 	map<UserAttr,UserAttr>::iterator itr_user_attr;
 	for(itr_user_attr = map_tbl_user_attr.begin();itr_user_attr != map_tbl_user_attr.end();itr_user_attr++)
 	{
 		fout<<itr_user_attr->second.toString();
 	}
+	fout.close();
 }
 //将用户-商品购买表中的数据写入用户商品购买表中
 /*
@@ -130,17 +131,18 @@ int workday_buy_count;//商品工作日被此用户购买的次数
 int weekend_buy_count;//商品周末被此用户购买的次数
 int festival_buy_count;//商品节日被此用户购买的次数
 */
-void writeToFile_user_item(map<User_Item,User_Item> map_tbl_user_item,string path_user_item)
+void writeToFile_user_item(map<User_Item,User_Item> &map_tbl_user_item,string path_user_item)
 {
 	ofstream fout(path_user_item);
 	if(!fout)
 		cout<<"打开文件失败"<<endl;
-	fout<<"user_id,item_id,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count\r\n";
+	fout<<"user_id,item_id,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count\n";
 	map<User_Item,User_Item>::iterator itr_user_item;
 	for(itr_user_item = map_tbl_user_item.begin();itr_user_item != map_tbl_user_item.end();itr_user_item++)
 	{
 		fout<<itr_user_item->second.toString();
 	}
+	fout.close();
 }
 //将用户-购买地址表中的数据写入用户购买地址表中
 /*
@@ -150,22 +152,23 @@ int buy_count;//用户在此地址购买商品的数量
 int workday_buy_count;//用户工作日购买次数
 int weekend_buy_count;//用户周末购买次数
 int festival_buy_count;//用户节日购买次数*/
-void writeToFile_user_geo(map<User_Geo,User_Geo> map_tbl_user_geo,string path_user_geo)
+void writeToFile_user_geo(map<User_Geo,User_Geo> &map_tbl_user_geo,string path_user_geo)
 {
 	ofstream fout(path_user_geo);
 	if(!fout)
 		cout<<"打开文件失败"<<endl;
-	fout<<"user_id,geohash,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count\r\n";
+	fout<<"user_id,geohash,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count\n";
 	map<User_Geo,User_Geo>::iterator itr_user_geo;
 	for(itr_user_geo = map_tbl_user_geo.begin();itr_user_geo != map_tbl_user_geo.end();itr_user_geo++)
 	{
 		fout<<itr_user_geo->second.toString();
 	}
+	fout.close();
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	ifstream fin("D:\\Users\\yuanyulong\\workspace\\AlibabaComp\\files\\tianchi_mobile_recommend_train_user\\tianchi_mobile_recommend_train_user.csv",ios::in);
+	ifstream fin("D:\\Users\\yuanyulong\\workspace\\AlibabaComp\\files\\tianchi_mobile_recommend_train_user (1)\\AlibabaData\\recommend_train_user_2014_12_18.csv",ios::in);
 	string value;
 	int i = 0;
 	string user_id;
@@ -184,17 +187,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	map<User_Geo,User_Geo> map_tbl_user_geo;//用户-购买地址表
 
 //四张表的存储地址
-	string path_item_attr = "D:\\data\\vs2010Project\\AlibabaCP\\tbl_item_attr.csv";
-	string path_user_attr = "D:\\data\\vs2010Project\\AlibabaCP\\tbl_user_attr.csv";
-	string path_user_item = "D:\\data\\vs2010Project\\AlibabaCP\\tbl_user_item.csv";
-	string path_user_geo = "D:\\data\\vs2010Project\\AlibabaCP\\tbl_user_geo.csv";
+	string path_item_attr = "D:\\Users\\yuanyulong\\workspace\\AlibabaComp\\files\\tianchi_mobile_recommend_train_user (1)\\tbl_item_attr\\tbl_item_attr_2014_12_18.csv";
+	string path_user_attr = "D:\\Users\\yuanyulong\\workspace\\AlibabaComp\\files\\tianchi_mobile_recommend_train_user (1)\\tbl_user_attr\\tbl_user_attr_2014_12_18.csv";
+	string path_user_item = "D:\\Users\\yuanyulong\\workspace\\AlibabaComp\\files\\tianchi_mobile_recommend_train_user (1)\\tbl_user_item\\tbl_user_item_2014_12_18.csv";
+	string path_user_geo = "D:\\Users\\yuanyulong\\workspace\\AlibabaComp\\files\\tianchi_mobile_recommend_train_user (1)\\tbl_user_geo\\tbl_user_geo_2014_12_18.csv";
 
 	long beginTime = clock();//获得开始时间,单位为毫秒
 
-	getline(fin,value);
-	while(fin.good())
+	//getline(fin,value);
+	while(getline(fin,value))
 	{
-		getline(fin,value);//获取文件的一行
+		//getline(fin,value);//获取文件的一行
 		list<string> list_str = split(value,",");//使用","将字符串进行分隔
 		list<string>::iterator itor_str = list_str.begin();
 		user_id = *itor_str++;//获取文件一行中的user_id
@@ -203,15 +206,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		user_geohash = *++itor_str;//获取文件一行中的user_geohash
 		itor_str++;
 		item_category = *itor_str++;//获取文件一行中的item_category
-		time = *itor_str;
-		date = time.substr(0,time.find_first_of(" "));
+		time = *itor_str++;
+		//date = time.substr(0,time.find_first_of(" "));
 
 		int nYear;
 		int nMonth;
 		int nDate;
 		int nHour;
-		sscanf(time.c_str(),"%d-%d-%d %d",&nYear,&nMonth,&nDate,&nHour);
-		
+		sscanf(time.c_str(),"%d-%d-%d",&nYear,&nMonth,&nDate);
+		nHour = atoi((*itor_str).c_str());
+
+/*
 //生成四张表的表项
 //在tbl_item_attr属性表中添加一个新的项
 		ItemAttr itmattr;
@@ -371,7 +376,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			map_tbl_user_attr.insert(make_pair(usrattr,usrattr));
 		}
-
+*/
 //在tbl_user_item表中添加一个新的项
 		User_Item usritm;
 		usritm.user_id = user_id;
@@ -503,13 +508,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	//writeToFile_item_attr(map_tbl_item_attr,path_item_attr);
+	//map_tbl_item_attr.clear();
 	//writeToFile_user_attr(map_tbl_user_attr,path_user_attr);
-	//writeToFile_user_item( map_tbl_user_item,path_user_item);
-	//writeToFile_user_geo(map_tbl_user_geo,path_user_geo);
-
+	//map_tbl_user_attr.clear();
+	writeToFile_user_item( map_tbl_user_item,path_user_item);
+	//map_tbl_user_item.clear();
+	writeToFile_user_geo(map_tbl_user_geo,path_user_geo);
+	//map_tbl_user_geo.clear();
+	fin.close();
 	long endTime = clock();//获得结束时间
 	cout<<"running time:"<<endTime-beginTime<<endl;
-	system("pause");
+	//system("pause");
 	return 0;
 }
 

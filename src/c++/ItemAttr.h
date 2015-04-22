@@ -20,7 +20,7 @@ public:
 	string toString();
 	bool operator<(const ItemAttr &a)const
 	{
-			return item_id < a.item_id;
+		return item_id < a.item_id;
 	}
 
 };
