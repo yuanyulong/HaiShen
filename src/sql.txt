@@ -70,6 +70,8 @@ CREATE TABLE `tbl_user_item_temp` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11427739 DEFAULT CHARSET=latin1;
 
 
+create table tbl_tianchi_mobile_recommend_train_item(idx INT NOT NULL AUTO_INCREMENT,item_id varchar(25),item_geohash varchar(20),item_category varchar(20),primary key(idx));
+
 insert into tbl_item_attr(item_id,geohash,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count,clicked_count,collected_count,addedincart_count) select item_id,geohash,item_category,sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count),sum(clicked_count),sum(collected_count),sum(addedincart_count) from tbl_item_attr_temp group by item_id;
 
 insert into tbl_user_attr(user_id,click_count,collect_count,addincart_count,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) select user_id,sum(click_count),sum(collect_count),sum(addincart_count),sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count) from tbl_user_attr_temp group by user_id;
@@ -77,3 +79,43 @@ insert into tbl_user_attr(user_id,click_count,collect_count,addincart_count,buy_
 insert into tbl_user_item(user_id,item_id,item_category,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) select user_id,item_id,item_category,sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count) from tbl_user_item_temp group by user_id,item_id;
 
 insert into tbl_user_geo(user_id,geohash,buy_count,workday_buy_count,weekend_buy_count,festival_buy_count) select user_id,geohash,sum(buy_count),sum(workday_buy_count),sum(weekend_buy_count),sum(festival_buy_count) from tbl_user_geo_temp group by user_id,geohash;
+
+select min(t1.buy_count) from (select buy_count from tbl_item_attr order by buy_count desc limit 2000) as t1;
+
+
+select item_id,user_id from tbl_tianchi_mobile_recommend_train_user_new where behavior_type=4 and (time='2014-12-16' or time='2014-12-17' or time='2014-12-18') and item_id in (select item_id from tbl_item_attr where buy_count>4 and workday_buy_count>3) and user_id in (select user_id from tbl_user_attr where buy_count>18 and workday_buy_count>12);
+
+
+select count(*) from tbl_user_item where buy_count >1 and workday_buy_count>1 and item_id in (select item_id from tbl_tianchi_mobile_recommend_train_item);
+
+
+select a.user_id,a.item_id from (select * from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-17' and behavior_type<>4)as a join (select * from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-18' and behavior_type=4) as b on a.user_id=b.user_id and a.item_id=b.item_id group by a.user_id,a.item_id;
+
+select a.user_id,a.item_id from (select * from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-18' and behavior_type=4) as a join  (select * from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-17' and behavior_type<>4) as b on a.user_id=b.user_id and a.item_id=b.item_id group by a.user_id,a.item_id;
+
+
+
+select user_id,item_id from tbl_tianchi_mobile_recommend_train_user_new where (behavior_type=3 or behavior_type=2 or behavior_type=1) and (time='2014-12-16' or time='2014-12-17' or time='2014-12-18') and item_id in (select item_id from tbl_item_attr where buy_count>4 and workday_buy_count>3) and user_id in (select user_id from tbl_user_attr where buy_count>18 and workday_buy_count>12) group by user_id,item_id;
+
+select a.user_id,a.item_id from (select * from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-18' and behavior_type=4) as a inner join  (select * from tbl_tianchi_mobile_recommend_train_user_new where (time='2014-12-17' or time='2014-12-16' or time='2014-12-15') and behavior_type<>4) as b on a.user_id=b.user_id and a.item_id=b.item_id;
+
+
+select a.user_id,a.item_id from (select * from tbl_tianchi_mobile_recommend_train_user_new where time='2014-12-17' and behavior_type=4) as a,(select user_id,item_id from tbl_tianchi_mobile_recommend_train_user_new where (time='2014-12-16' or time='2014-12-15' or time='2014-12-14') and behavior_type<>4 group by user_id,item_id) as b where a.user_id=b.user_id and a.item_id=b.item_id;
+
+
+select user_id,item_id from tbl_tianchi_mobile_recommend_train_user_new where (time='2014-12-16' or time='2014-12-15' or time='2014-12-14') and behavior_type<>4 group by user_id,item_id;
+
+
+select user_id,item_id from tbl_tianchi_mobile_recommend_train_user_new where item_id in (select item_id from tbl_item_attr where buy_count>2) and item_id in (select item_id from tbl_tianchi_mobile_recommend_train_item) and user_id in (select user_id from tbl_user_attr where buy_count>5) group by user_id,item_id;
+
+
+select a.user_id,a.item_id,avg(b.buy_count),avg(b.click_count) as ck,avg(c.clicked_count) from tbl_tianchi_mobile_recommend_train_user_new as a,tbl_user_attr as b,tbl_item_attr as c where a.user_id=b.user_id and a.item_id=c.item_id and a.behavior_type=4 and a.time='2014-12-18' and c.buy_count>=1 and b.buy_count>=1 group by user_id,item_id order by avg(c.clicked_count) desc limit 2000;
+
+
+select user_id,item_id from tbl_tianchi_mobile_recommend_train_user_new where (behavior_type=3) and (time='2014-12-16' or time='2014-12-17' or time='2014-12-18') and item_id in (select item_id from tbl_item_attr where clicked_count>7 and buy_count>1) and user_id in (select user_id from tbl_user_attr where click_count>1000 and buy_count>1) group by user_id,item_id;
+
+select user_id,item_id from tbl_tianchi_mobile_recommend_train_user_new where (behavior_type=3) and (time='2014-12-16' or time='2014-12-17' or time='2014-12-18') and item_id in (select item_id from tbl_item_attr where clicked_count>7) and user_id in (select user_id from tbl_user_attr where click_count>1000 and buy_count>1) group by user_id,item_id;
+
+
+
+into outfile '/home/mysql/AlibabaData/result.csv' fields terminated by ',' lines terminated by '\n';

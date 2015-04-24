@@ -424,7 +424,6 @@ public class Data {
 					int weekend_buy_count = Integer.parseInt(str[4]);
 					int festival_buy_count = Integer.parseInt(str[5]);
 
-					pstmt = dbconn.conn.prepareStatement(sql);
 					pstmt.setString(1, user_id);
 					pstmt.setString(2, geohash);
 					pstmt.setInt(3, buy_count);
@@ -513,7 +512,6 @@ public class Data {
 					int weekend_buy_count = Integer.parseInt(str[5]);
 					int festival_buy_count = Integer.parseInt(str[6]);
 
-					pstmt = dbconn.conn.prepareStatement(sql);
 					pstmt.setString(1, user_id);
 					pstmt.setString(2, item_id);
 					pstmt.setString(3, item_category);
